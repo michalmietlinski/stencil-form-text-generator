@@ -1,0 +1,11 @@
+{
+  "text": "Hello",
+  "mode": "combined",
+  "productMode": "form",
+  "pocketDepth": 1.5,
+  "plateThickness": 2,
+  "platePadding": 4,
+  "characterHeight": 30,
+  "spacing": 2,
+  "fontUrl": "https://github.com/google/fonts/raw/main/ofl/pacifico/Pacifico-Regular.ttf"
+}

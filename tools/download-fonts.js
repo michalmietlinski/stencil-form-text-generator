@@ -1,0 +1,132 @@
+#!/usr/bin/env node
+/**
+ * Download a curated set of TTF fonts (Google Fonts, OFL) into fonts/ for CLI and web.
+ * Run: npm run download-fonts
+ * Then: npm run build-web (to sync web/fonts and regenerate manifest).
+ */
+
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, "..");
+const FONTS_DIR = path.join(ROOT, "fonts");
+const GITHUB_BASE = "https://raw.githubusercontent.com/google/fonts/main";
+
+// [url, destFilename]. Static + variable TTFs from Google Fonts GitHub (opentype.js supports both).
+const FONT_ENTRIES = [
+  // Static
+  [`${GITHUB_BASE}/ofl/opensans/OpenSans-Bold.ttf`, "OpenSans-Bold.ttf"],
+  [`${GITHUB_BASE}/ofl/opensans/OpenSans-Regular.ttf`, "OpenSans-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/roboto/Roboto-Bold.ttf`, "Roboto-Bold.ttf"],
+  [`${GITHUB_BASE}/ofl/roboto/Roboto-Regular.ttf`, "Roboto-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/lato/Lato-Regular.ttf`, "Lato-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/lato/Lato-Bold.ttf`, "Lato-Bold.ttf"],
+  [`${GITHUB_BASE}/ofl/poppins/Poppins-Regular.ttf`, "Poppins-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/poppins/Poppins-Bold.ttf`, "Poppins-Bold.ttf"],
+  [`${GITHUB_BASE}/ofl/firasans/FiraSans-Regular.ttf`, "FiraSans-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/firasans/FiraSans-Bold.ttf`, "FiraSans-Bold.ttf"],
+  [`${GITHUB_BASE}/ufl/ubuntu/Ubuntu-Regular.ttf`, "Ubuntu-Regular.ttf"],
+  [`${GITHUB_BASE}/ufl/ubuntu/Ubuntu-Bold.ttf`, "Ubuntu-Bold.ttf"],
+  // Variable (one file per family; opentype.js uses default instance)
+  [`${GITHUB_BASE}/ofl/montserrat/Montserrat%5Bwght%5D.ttf`, "Montserrat-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/oswald/Oswald%5Bwght%5D.ttf`, "Oswald-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/raleway/Raleway%5Bwght%5D.ttf`, "Raleway-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/nunito/Nunito%5Bwght%5D.ttf`, "Nunito-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/playfairdisplay/PlayfairDisplay%5Bwght%5D.ttf`, "PlayfairDisplay-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/worksans/WorkSans%5Bwght%5D.ttf`, "WorkSans-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/sourcesans3/SourceSans3%5Bwght%5D.ttf`, "SourceSans3-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/librefranklin/LibreFranklin%5Bwght%5D.ttf`, "LibreFranklin-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/quicksand/Quicksand%5Bwght%5D.ttf`, "Quicksand-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/merriweather/Merriweather%5Bopsz%2Cwdth%2Cwght%5D.ttf`, "Merriweather-Variable.ttf"],
+  // Additional families
+  [`${GITHUB_BASE}/ofl/inter/Inter%5Bopsz%2Cwght%5D.ttf`, "Inter-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/manrope/Manrope%5Bwght%5D.ttf`, "Manrope-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/mulish/Mulish%5Bwght%5D.ttf`, "Mulish-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/inconsolata/static/Inconsolata-Regular.ttf`, "Inconsolata-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/karla/Karla%5Bwght%5D.ttf`, "Karla-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/bebasneue/BebasNeue-Regular.ttf`, "BebasNeue-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/anton/Anton-Regular.ttf`, "Anton-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/barlow/Barlow-Regular.ttf`, "Barlow-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/barlowcondensed/BarlowCondensed-Regular.ttf`, "BarlowCondensed-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/notosans/NotoSans%5Bwdth%2Cwght%5D.ttf`, "NotoSans-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/notoserif/NotoSerif%5Bwdth%2Cwght%5D.ttf`, "NotoSerif-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/josefinsans/JosefinSans%5Bwght%5D.ttf`, "JosefinSans-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/rubik/Rubik%5Bwght%5D.ttf`, "Rubik-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/comfortaa/Comfortaa%5Bwght%5D.ttf`, "Comfortaa-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/exo2/Exo2%5Bwght%5D.ttf`, "Exo2-Wght.ttf"],
+  // More OFL families (URLs verified against google/fonts main)
+  [`${GITHUB_BASE}/ofl/dmsans/DMSans%5Bopsz%2Cwght%5D.ttf`, "DMSans-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/lexend/Lexend%5Bwght%5D.ttf`, "Lexend-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/figtree/Figtree%5Bwght%5D.ttf`, "Figtree-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/spacegrotesk/SpaceGrotesk%5Bwght%5D.ttf`, "SpaceGrotesk-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf`, "PlusJakartaSans-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/titilliumweb/TitilliumWeb-Regular.ttf`, "TitilliumWeb-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/cabin/Cabin%5Bwdth%2Cwght%5D.ttf`, "Cabin-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/dosis/Dosis%5Bwght%5D.ttf`, "Dosis-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/ibmplexsans/IBMPlexSans%5Bwdth%2Cwght%5D.ttf`, "IBMPlexSans-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/outfit/Outfit%5Bwght%5D.ttf`, "Outfit-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/sora/Sora%5Bwght%5D.ttf`, "Sora-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/urbanist/Urbanist%5Bwght%5D.ttf`, "Urbanist-Wght.ttf"],
+  [`${GITHUB_BASE}/ofl/mukta/Mukta-Regular.ttf`, "Mukta-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/varelaround/VarelaRound-Regular.ttf`, "VarelaRound-Regular.ttf"],
+  [`${GITHUB_BASE}/ofl/archivo/Archivo%5Bwdth%2Cwght%5D.ttf`, "Archivo-Variable.ttf"],
+  [`${GITHUB_BASE}/ofl/librebaskerville/LibreBaskerville%5Bwght%5D.ttf`, "LibreBaskerville-Wght.ttf"],
+];
+
+async function download(url) {
+  const res = await fetch(url, { redirect: "follow" });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.arrayBuffer();
+}
+
+// Deduplicate by dest filename (first URL wins)
+function uniqueByDest(entries) {
+  const seen = new Set();
+  return entries.filter(([, file]) => {
+    if (seen.has(file)) return false;
+    seen.add(file);
+    return true;
+  });
+}
+
+async function main() {
+  await fs.mkdir(FONTS_DIR, { recursive: true });
+
+  const entries = uniqueByDest(FONT_ENTRIES);
+  let ok = 0;
+  let skip = 0;
+  let fail = 0;
+
+  for (const [url, file] of entries) {
+    const dest = path.join(FONTS_DIR, file);
+
+    try {
+      await fs.access(dest);
+      console.log(`Skip (exists): ${file}`);
+      skip++;
+      continue;
+    } catch {
+      // file doesn't exist, download
+    }
+
+    try {
+      const buf = await download(url);
+      await fs.writeFile(dest, new Uint8Array(buf));
+      console.log(`OK: ${file}`);
+      ok++;
+    } catch (e) {
+      console.error(`FAIL: ${file} - ${e.message}`);
+      fail++;
+    }
+  }
+
+  console.log(`\nDone. Downloaded: ${ok}, skipped (existing): ${skip}, failed: ${fail}`);
+  console.log(`Fonts are in ${FONTS_DIR}. Run "npm run build-web" to update web font list.`);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exitCode = 1;
+});

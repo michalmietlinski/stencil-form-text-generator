@@ -1,0 +1,12 @@
+{
+  "rectangleWidth": 140,
+  "rectangleHeight": 50,
+  "thickness": 2,
+  "productMode": "form",
+  "pocketDepth": 1.5,
+  "text": "Short\nLonger Text Line",
+  "padding": 3,
+  "textAlign": "right",
+  "fontUrl": "https://cdn.jsdelivr.net/npm/opensans-font@1.0.0/OpenSans-Bold.ttf",
+  "addStake": false
+}

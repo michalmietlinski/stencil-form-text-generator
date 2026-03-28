@@ -1,0 +1,294 @@
+{
+  "fonts": [
+    {
+      "name": "AllertaStencil-Regular",
+      "url": "fonts/AllertaStencil-Regular.ttf",
+      "stencil": true
+    },
+    {
+      "name": "Anton-Regular",
+      "url": "fonts/Anton-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Archivo-Variable",
+      "url": "fonts/Archivo-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Barlow-Regular",
+      "url": "fonts/Barlow-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "BarlowCondensed-Regular",
+      "url": "fonts/BarlowCondensed-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "BebasNeue-Regular",
+      "url": "fonts/BebasNeue-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "BlackOpsOne-Regular",
+      "url": "fonts/BlackOpsOne-Regular.ttf",
+      "stencil": true
+    },
+    {
+      "name": "Cabin-Variable",
+      "url": "fonts/Cabin-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Comfortaa-Wght",
+      "url": "fonts/Comfortaa-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "DMSans-Variable",
+      "url": "fonts/DMSans-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Dosis-Wght",
+      "url": "fonts/Dosis-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Exo2-Wght",
+      "url": "fonts/Exo2-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Figtree-Wght",
+      "url": "fonts/Figtree-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "FiraSans-Bold",
+      "url": "fonts/FiraSans-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "FiraSans-Regular",
+      "url": "fonts/FiraSans-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "IBMPlexSans-Variable",
+      "url": "fonts/IBMPlexSans-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Inconsolata-Regular",
+      "url": "fonts/Inconsolata-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Inter-Variable",
+      "url": "fonts/Inter-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "JosefinSans-Wght",
+      "url": "fonts/JosefinSans-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Karla-Wght",
+      "url": "fonts/Karla-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Lato-Bold",
+      "url": "fonts/Lato-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Lato-Regular",
+      "url": "fonts/Lato-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Lexend-Wght",
+      "url": "fonts/Lexend-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "LibreBaskerville-Wght",
+      "url": "fonts/LibreBaskerville-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "LibreFranklin-Wght",
+      "url": "fonts/LibreFranklin-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Manrope-Wght",
+      "url": "fonts/Manrope-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Merriweather-Variable",
+      "url": "fonts/Merriweather-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Montserrat-Wght",
+      "url": "fonts/Montserrat-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Mukta-Regular",
+      "url": "fonts/Mukta-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Mulish-Wght",
+      "url": "fonts/Mulish-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "NotoSans-Variable",
+      "url": "fonts/NotoSans-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "NotoSerif-Variable",
+      "url": "fonts/NotoSerif-Variable.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Nunito-Wght",
+      "url": "fonts/Nunito-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "OpenSans-Bold",
+      "url": "fonts/OpenSans-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "OpenSans-Regular",
+      "url": "fonts/OpenSans-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Oswald-Wght",
+      "url": "fonts/Oswald-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Outfit-Wght",
+      "url": "fonts/Outfit-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "PlayfairDisplay-Wght",
+      "url": "fonts/PlayfairDisplay-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "PlusJakartaSans-Wght",
+      "url": "fonts/PlusJakartaSans-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Poppins-Bold",
+      "url": "fonts/Poppins-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Poppins-Regular",
+      "url": "fonts/Poppins-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Quicksand-Wght",
+      "url": "fonts/Quicksand-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Raleway-Wght",
+      "url": "fonts/Raleway-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Roboto-Bold",
+      "url": "fonts/Roboto-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Roboto-Regular",
+      "url": "fonts/Roboto-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Rubik-Wght",
+      "url": "fonts/Rubik-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "SairaStencilOne-Regular",
+      "url": "fonts/SairaStencilOne-Regular.ttf",
+      "stencil": true
+    },
+    {
+      "name": "Sora-Wght",
+      "url": "fonts/Sora-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "SourceSans3-Wght",
+      "url": "fonts/SourceSans3-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "SpaceGrotesk-Wght",
+      "url": "fonts/SpaceGrotesk-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "StardosStencil-Bold",
+      "url": "fonts/StardosStencil-Bold.ttf",
+      "stencil": true
+    },
+    {
+      "name": "StardosStencil-Regular",
+      "url": "fonts/StardosStencil-Regular.ttf",
+      "stencil": true
+    },
+    {
+      "name": "TitilliumWeb-Regular",
+      "url": "fonts/TitilliumWeb-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Ubuntu-Bold",
+      "url": "fonts/Ubuntu-Bold.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Ubuntu-Regular",
+      "url": "fonts/Ubuntu-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "Urbanist-Wght",
+      "url": "fonts/Urbanist-Wght.ttf",
+      "stencil": false
+    },
+    {
+      "name": "VarelaRound-Regular",
+      "url": "fonts/VarelaRound-Regular.ttf",
+      "stencil": false
+    },
+    {
+      "name": "WorkSans-Wght",
+      "url": "fonts/WorkSans-Wght.ttf",
+      "stencil": false
+    }
+  ]
+}

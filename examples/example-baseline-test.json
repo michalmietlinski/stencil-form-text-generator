@@ -1,0 +1,11 @@
+{
+  "text": "Typography",
+  "mode": "combined",
+  "productMode": "form",
+  "pocketDepth": 1,
+  "plateThickness": 2,
+  "platePadding": 3,
+  "characterHeight": 25,
+  "spacing": 1,
+  "fontName": "OpenSans-Regular"
+}

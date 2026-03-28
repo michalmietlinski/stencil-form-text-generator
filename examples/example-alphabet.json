@@ -1,0 +1,10 @@
+{
+  "text": "ABC",
+  "mode": "separate",
+  "productMode": "form",
+  "pocketDepth": 2,
+  "plateThickness": 4,
+  "platePadding": 2,
+  "characterHeight": 25,
+  "fontName": "Roboto-Regular"
+}

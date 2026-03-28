@@ -1,0 +1,10 @@
+{
+  "text": "STENCIL",
+  "mode": "combined",
+  "productMode": "stencil",
+  "characterHeight": 20,
+  "spacing": 1,
+  "plateThickness": 2,
+  "platePadding": 3,
+  "fontName": "StardosStencil-Bold"
+}

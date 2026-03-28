@@ -1,0 +1,11 @@
+{
+  "text": "HELLO",
+  "mode": "combined",
+  "productMode": "form",
+  "pocketDepth": 1.5,
+  "plateThickness": 2,
+  "platePadding": 3,
+  "characterHeight": 20,
+  "spacing": 1,
+  "fontName": "Roboto-Bold"
+}
