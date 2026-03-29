@@ -26,13 +26,23 @@ node src/cli/index.js --input examples/example-stencil.json --output output/sten
 
 **Stencil** example must use an allowlist font (e.g. `StardosStencil-Bold`). **Form** examples use `pocketDepth` and `plateThickness` with `productMode: "form"`.
 
-Charset batches (pocket cut, all fonts in `fonts/`):
+Batch **a–z, A–Z, 0–9** as separate STLs, one folder per font (defaults: 3 mm pocket / 4 mm plate for form; through cut for stencil):
+
+```bash
+npm run generate-base-forms
+npm run generate-base-stencils
+```
+
+- **`generate-base-forms`** → `output/base-alphabet-forms/` — **form** (pocket), every font under `fonts/`.
+- **`generate-base-stencils`** → `output/base-alphabet-stencils/` — **stencil** (through cut), **allowlist stencil fonts only**.
+
+Optional: `--fonts Name1,Name2` or `--limit 10`, `--product-mode form|stencil`, `--pocketDepth`, `--plateThickness`.
+
+Full multilingual charset (form mode, all fonts):
 
 ```bash
 npm run generate-full-set -- --output output/alphabet-all-fonts
 ```
-
-Use `--pocketDepth` and `--plateThickness` to tune stock (defaults: 3 mm pocket, 4 mm plate).
 
 ## JSON parameters (`generateFontToSTL`)
 

@@ -7,6 +7,9 @@
   "scripts": {
     "generate": "node src/cli/index.js",
     "generate-base-set": "node src/cli/index.js --generate-base-set",
+    "generate-base-forms": "node src/cli/index.js --generate-base-set --product-mode form --output output/base-alphabet-forms",
+    "generate-base-stencils": "node src/cli/index.js --generate-base-set --product-mode stencil --output output/base-alphabet-stencils",
+    "generate-base-10": "node src/cli/index.js --generate-base-set --limit 10 --output output/base-alphabet-10-fonts",
     "generate-full-set": "node src/cli/index.js --generate-full-set",
     "generate-both-sets": "node src/cli/index.js --generate-both-sets",
     "build-web": "node tools/build_web.js",

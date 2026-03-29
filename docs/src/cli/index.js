@@ -1,9 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { generate, generateFontToSTL } from "../core/textPlate.js";
+import { generate, generateFontToSTL, isStencilAllowedFontName } from "../core/textPlate.js";
 
 const FONT_EXTS = [".ttf", ".otf", ".ttc"];
+/** Default folders for batch a-z A-Z 0-9 (separate STLs per letter, one subfolder per font). */
+const DEFAULT_FORMS_OUTPUT_DIR = path.join("output", "base-alphabet-forms");
+const DEFAULT_STENCILS_OUTPUT_DIR = path.join("output", "base-alphabet-stencils");
 const DEFAULT_FULL_SET_OUTPUT_DIR = path.join("output", "alphabet-all-fonts");
 const DEFAULT_FULL_SET_POCKET_DEPTH = 3;
 const DEFAULT_FULL_SET_PLATE_THICKNESS = 4;
@@ -157,9 +160,12 @@ Required:
 
 Optional:
   --output <path>    Output STL path or directory (default: output/)
-  --generate-base-set  Base charset per font (form mode; uses all fonts)
-  --generate-full-set  Full charset per font (form mode)
+  --generate-base-set  Base charset (a-z, A-Z, 0-9) per font, separate STLs, one folder per font
+  --generate-full-set  Full charset per font
   --generate-both-sets Both base and full sets
+  --product-mode <form|stencil>  Batch cut type: form = pocket (all fonts); stencil = through-cut (allowlist fonts only). Default: form
+  --fonts <list>       Comma-separated font names (basename without extension) to include; default: all
+  --limit <n>          With --generate-*-set, only process the first n fonts (alphabetically) if --fonts omitted
   --characterHeight <mm>  Character height for set generation (default: 50)
   --pocketDepth <mm>      Pocket depth for set generation (default: ${DEFAULT_FULL_SET_POCKET_DEPTH})
   --plateThickness <mm>   Stock thickness for set generation (default: ${DEFAULT_FULL_SET_PLATE_THICKNESS})
@@ -252,20 +258,28 @@ function extractFontName(params) {
   return "font";
 }
 
+/** "Form" for pocket mode, "stencil" for through-cut (matches user-facing names). */
+function productFileTag(params, resultMeta) {
+  const pm = String(resultMeta?.productMode ?? params?.productMode ?? "form").toLowerCase();
+  return pm === "stencil" ? "stencil" : "Form";
+}
+
 function buildCombinedDefaultName(params, resultMeta) {
   const textPart = sanitizeFilePart(resultMeta?.text || params.text || "text");
   const fontPart = sanitizeFilePart(extractFontName(params), "font");
   const modePart = sanitizeFilePart(params.mode || "combined");
-  return `${textPart}_${fontPart}_${modePart}.stl`;
+  const tag = sanitizeFilePart(productFileTag(params, resultMeta), "form");
+  return `${textPart}_${fontPart}_${modePart}_${tag}.stl`;
 }
 
 function buildSeparateLetterName(letterChar, params, usedNames) {
   const charPart = sanitizeFilePart(letterChar, "letter");
   const fontPart = sanitizeFilePart(extractFontName(params), "font");
+  const tag = sanitizeFilePart(productFileTag(params, null), "form");
   const codePart = Array.from(String(letterChar))
     .map((ch) => ch.codePointAt(0).toString(16).toUpperCase())
     .join("-");
-  const base = `${charPart}_U${codePart}_${fontPart}`;
+  const base = `${charPart}_U${codePart}_${fontPart}_${tag}`;
   const seen = usedNames.get(base) ?? 0;
   usedNames.set(base, seen + 1);
   const uniqueSuffix = seen === 0 ? "" : `_${seen + 1}`;
@@ -298,29 +312,99 @@ function buildBaseAlphabetSetText() {
   return `${lowercase}${uppercase}${digits}`;
 }
 
+/**
+ * @param {{ name: string, file: string }[]} fonts
+ * @param {{ fonts?: string, limit?: string }} args
+ */
+function applyFontFilter(fonts, args) {
+  if (args.fonts != null && String(args.fonts).trim() !== "") {
+    const wanted = String(args.fonts)
+      .split(/[,;]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (wanted.length === 0) {
+      throw new Error("--fonts list is empty.");
+    }
+    const byLower = new Map(fonts.map((f) => [f.name.toLowerCase(), f]));
+    const out = [];
+    const missing = [];
+    for (const w of wanted) {
+      const f = byLower.get(w.toLowerCase());
+      if (f) out.push(f);
+      else missing.push(w);
+    }
+    if (missing.length > 0) {
+      throw new Error(`Unknown font(s) in --fonts: ${missing.join(", ")}`);
+    }
+    return out;
+  }
+  if (args.limit != null && String(args.limit).trim() !== "") {
+    const n = parseInt(String(args.limit), 10);
+    if (!Number.isFinite(n) || n <= 0) {
+      throw new Error("--limit must be a positive integer.");
+    }
+    if (n < fonts.length) {
+      return fonts.slice(0, n);
+    }
+    console.warn(`Note: --limit ${n} ≥ ${fonts.length} available fonts; using all ${fonts.length}.`);
+  }
+  return fonts;
+}
+
+function getCliProductMode(args) {
+  const raw = args.productMode ?? args["product-mode"];
+  if (raw == null || String(raw).trim() === "") return "form";
+  const pm = String(raw).toLowerCase().trim();
+  if (pm !== "form" && pm !== "stencil") {
+    throw new Error('--product-mode must be "form" or "stencil".');
+  }
+  return pm;
+}
+
 async function generateSetForAllFonts(args, options) {
-  const fonts = await listAvailableFonts();
+  const productMode = getCliProductMode(args);
+  let fonts = await listAvailableFonts();
   if (fonts.length === 0) {
     throw new Error("No fonts available. Put TTF/OTF files into `fonts/` first.");
+  }
+  fonts = applyFontFilter(fonts, args);
+  if (fonts.length === 0) {
+    throw new Error("No fonts left after --fonts / --limit filter.");
+  }
+  if (productMode === "stencil") {
+    fonts = fonts.filter((f) => isStencilAllowedFontName(f.name));
+    if (fonts.length === 0) {
+      throw new Error(
+        "Stencil batch: no allowlisted stencil fonts in fonts/ after filters. Add OFL stencil files (e.g. StardosStencil-Bold.ttf) or adjust --fonts."
+      );
+    }
   }
 
   const text = options.text;
   const outputRoot = args.output || DEFAULT_FULL_SET_OUTPUT_DIR;
-  const pocketDepth = Number(args.pocketDepth ?? args.letterHeight ?? DEFAULT_FULL_SET_POCKET_DEPTH);
   const plateThickness = Number(args.plateThickness ?? DEFAULT_FULL_SET_PLATE_THICKNESS);
   const characterHeight = Number(args.characterHeight ?? DEFAULT_FULL_SET_CHARACTER_HEIGHT);
-  if (!Number.isFinite(pocketDepth) || pocketDepth <= 0) {
-    throw new Error("--pocketDepth must be a positive number");
-  }
-  if (!Number.isFinite(plateThickness) || plateThickness <= 0 || pocketDepth > plateThickness) {
-    throw new Error("--plateThickness must be > 0 and ≥ pocketDepth");
+
+  let pocketDepth;
+  if (productMode === "form") {
+    pocketDepth = Number(args.pocketDepth ?? args.letterHeight ?? DEFAULT_FULL_SET_POCKET_DEPTH);
+    if (!Number.isFinite(pocketDepth) || pocketDepth <= 0) {
+      throw new Error("--pocketDepth must be a positive number");
+    }
+    if (!Number.isFinite(plateThickness) || plateThickness <= 0 || pocketDepth > plateThickness) {
+      throw new Error("--plateThickness must be > 0 and ≥ pocketDepth");
+    }
+  } else {
+    if (!Number.isFinite(plateThickness) || plateThickness <= 0) {
+      throw new Error("--plateThickness must be a positive number (stock thickness for through cut).");
+    }
   }
   if (!Number.isFinite(characterHeight) || characterHeight <= 0) {
     throw new Error("--characterHeight must be a positive number");
   }
 
   await fs.mkdir(outputRoot, { recursive: true });
-  console.log(`Generating ${options.label} for ${fonts.length} fonts...`);
+  console.log(`Generating ${options.label} for ${fonts.length} font(s) — productMode=${productMode}`);
   console.log(`Charset size: ${Array.from(text).length} characters`);
   console.log(`Output root: ${outputRoot}\n`);
 
@@ -334,14 +418,16 @@ async function generateSetForAllFonts(args, options) {
     const params = {
       text,
       mode: "separate",
-      productMode: "form",
-      pocketDepth,
+      productMode,
       plateThickness,
       platePadding: 2,
       characterHeight,
       fontName: font.name,
       fontPath: path.join(getFontsDir(), font.file),
     };
+    if (productMode === "form") {
+      params.pocketDepth = pocketDepth;
+    }
 
     try {
       const result = await generateFontToSTL(params, { debug: args.debug });

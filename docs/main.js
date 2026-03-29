@@ -102,21 +102,28 @@ function selectedFontName() {
   return tail.replace(/\.[^.]+$/, '') || 'font';
 }
 
-function buildCombinedStlName(text, fontName) {
+function productDownloadTag(productMode) {
+  return String(productMode || 'form').toLowerCase() === 'stencil' ? 'stencil' : 'Form';
+}
+
+function buildCombinedStlName(text, fontName, productMode) {
   const textPart = safeFileName(text || 'text');
   const fontPart = safeFileName(fontName || 'font');
-  return `${textPart}_${fontPart}_combined.stl`;
+  const tag = safeFileName(productDownloadTag(productMode));
+  return `${textPart}_${fontPart}_combined_${tag}.stl`;
 }
 
-function buildZipName(text, fontName) {
+function buildZipName(text, fontName, productMode) {
   const textPart = safeFileName(text || 'letters');
   const fontPart = safeFileName(fontName || 'font');
-  return `${textPart}_${fontPart}_separate.zip`;
+  const tag = safeFileName(productDownloadTag(productMode));
+  return `${textPart}_${fontPart}_separate_${tag}.zip`;
 }
 
-/** Build unique STL filename per letter (e.g. H_OpenSans-Bold.stl, L_OpenSans-Bold_2.stl). */
-function letterStlName(char, fontName, countByChar) {
-  const base = `${safeFileName(char)}_${safeFileName(fontName || 'font')}`;
+/** Unique STL filename per letter; includes Form or stencil in the name. */
+function letterStlName(char, fontName, countByChar, productMode) {
+  const tag = safeFileName(productDownloadTag(productMode));
+  const base = `${safeFileName(char)}_${safeFileName(fontName || 'font')}_${tag}`;
   const n = countByChar.get(base) ?? 0;
   countByChar.set(base, n + 1);
   return n === 0 ? `${base}.stl` : `${base}_${n + 1}.stl`;
@@ -244,16 +251,16 @@ document.getElementById('generator-form').addEventListener('submit', async (e) =
       const countByChar = new Map();
       for (let i = 0; i < result.letters.length; i++) {
         const letter = result.letters[i];
-        const name = letterStlName(letter.char, fontName, countByChar);
+        const name = letterStlName(letter.char, fontName, countByChar, productMode);
         zip.file(name, letter.stl, { binary: true });
       }
       const zipBlob = await zip.generateAsync({ type: 'blob' });
-      const zipName = buildZipName(text, fontName);
+      const zipName = buildZipName(text, fontName, productMode);
       downloadZip(zipName, zipBlob);
       setStatus(`✅ Downloaded ${zipName} (${result.letters.length} letter STLs)`);
     } else {
       // Download single file
-      const filename = buildCombinedStlName(text, fontName);
+      const filename = buildCombinedStlName(text, fontName, productMode);
       downloadSTL(filename, result.stl);
       setStatus(`✅ Downloaded ${filename} successfully!`);
     }
